@@ -1,0 +1,25 @@
+{
+  "name": "polyglotci",
+  "version": "1.0.0",
+  "description": "GitHub PR bot that catches i18n translation bugs — context-aware translations and layout-overflow risk flags, right in the pull request.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdulraheemayeni001-hash/polyglotci.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/abdulraheemayeni001-hash/polyglotci/issues"
+  },
+  "homepage": "https://github.com/abdulraheemayeni001-hash/polyglotci#readme",
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "wrangler": "^4.129.0"
+  }
+}
