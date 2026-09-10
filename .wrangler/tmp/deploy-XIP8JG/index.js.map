@@ -1,8 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../src/index.ts"],
-  "sourceRoot": "/workspaces/polyglotci/.wrangler/tmp/deploy-XIP8JG",
-  "sourcesContent": ["export default {\n  async fetch(request: Request): Promise<Response> {\n    return new Response(\"Hello World!\");\n  },\n};\n"],
-  "mappings": ";AAAA,IAAO,gBAAQ;AAAA,EACb,MAAM,MAAM,SAAqC;AAC/C,WAAO,IAAI,SAAS,cAAc;AAAA,EACpC;AACF;",
-  "names": []
-}
