@@ -6,6 +6,12 @@ export interface Env {
   GITHUB_PRIVATE_KEY: string;
 }
 
+interface TranslationUsage {
+  key: string;
+  context: string;
+  line: string;
+}
+
 async function verifySignature(
   payload: string,
   signature: string | null,
@@ -76,6 +82,33 @@ async function getChangedFiles(
   return data;
 }
 
+function guessContext(line: string): string {
+  if (/<button|onClick=/i.test(line)) return "button";
+  if (/<input|placeholder=/i.test(line)) return "input";
+  if (/<nav|<Link/i.test(line)) return "nav";
+  if (/<label/i.test(line)) return "label";
+  return "generic text";
+}
+
+function extractTranslationKeys(patch: string): TranslationUsage[] {
+  const results: TranslationUsage[] = [];
+  const lines = patch.split("\n");
+  const keyPattern = /\bt\(\s*['"]([\w.\-]+)['"]\s*\)/g;
+
+  for (const line of lines) {
+    if (!line.startsWith("+") || line.startsWith("+++")) continue;
+    let match;
+    while ((match = keyPattern.exec(line)) !== null) {
+      results.push({
+        key: match[1],
+        context: guessContext(line),
+        line: line.replace(/^\+/, "").trim(),
+      });
+    }
+  }
+  return results;
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method !== "POST") {
@@ -101,12 +134,20 @@ export default {
         const prNumber = data.pull_request.number;
 
         const files = await getChangedFiles(installationToken, owner, repo, prNumber);
-        console.log(
-          `PR #${prNumber} in ${owner}/${repo} changed ${files.length} file(s):`,
-          files.map((f) => f.filename).join(", ")
-        );
+        const relevantFiles = files.filter((f) => /\.(tsx|jsx)$/.test(f.filename));
+
+        for (const file of relevantFiles) {
+          if (!file.patch) continue;
+          const usages = extractTranslationKeys(file.patch);
+          if (usages.length > 0) {
+            console.log(`Found ${usages.length} translation key(s) in ${file.filename}:`);
+            usages.forEach((u) =>
+              console.log(`  key="${u.key}" context=${u.context} | ${u.line}`)
+            );
+          }
+        }
       } catch (err) {
-        console.log("Error fetching PR files:", err);
+        console.log("Error processing PR:", err);
       }
     }
 
